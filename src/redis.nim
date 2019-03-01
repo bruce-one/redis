@@ -164,7 +164,7 @@ proc raiseInvalidReply(r: Redis | AsyncRedis, expected, got: char) =
           "Expected '$1' at the beginning of a status reply got '$2'" %
           [$expected, $got])
 
-proc raiseNoOK(r: Redis | AsyncRedis, status: string) =
+proc raiseNoOK*(r: Redis | AsyncRedis, status: string) =
   let pipelined = r.pipeline.enabled
   if pipelined and not (status == "QUEUED" or status == "PIPELINED"):
     raiseReplyError(r, "Expected \"QUEUED\" or \"PIPELINED\" got \"$1\"" % status)
