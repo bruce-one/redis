@@ -353,7 +353,7 @@ proc startPipelining*(r: Redis | AsyncRedis) =
   r.pipeline.expected = 0
   r.pipeline.enabled = true
 
-proc sendCommand(r: Redis | AsyncRedis, cmd: string): Future[void] {.multisync.} =
+proc sendCommand*(r: Redis | AsyncRedis, cmd: string): Future[void] {.multisync.} =
   var request = "*1\c\L"
   request.add("$" & $cmd.len() & "\c\L")
   request.add(cmd & "\c\L")
@@ -364,7 +364,7 @@ proc sendCommand(r: Redis | AsyncRedis, cmd: string): Future[void] {.multisync.}
   else:
     await r.managedSend(request)
 
-proc sendCommand(
+proc sendCommand*(
   r: Redis | AsyncRedis, cmd: string, args: seq[string]
 ): Future[void] {.multisync.} =
   var request = "*" & $(1 + args.len()) & "\c\L"
@@ -380,7 +380,7 @@ proc sendCommand(
   else:
     await r.managedSend(request)
 
-proc sendCommand(
+proc sendCommand*(
   r: Redis | AsyncRedis, cmd: string, arg1: string
 ): Future[void] {.multisync.} =
   var request = "*2\c\L"
@@ -395,7 +395,7 @@ proc sendCommand(
   else:
     await r.managedSend(request)
 
-proc sendCommand(r: Redis | AsyncRedis, cmd: string, arg1: string,
+proc sendCommand*(r: Redis | AsyncRedis, cmd: string, arg1: string,
                  args: seq[string]): Future[void] {.multisync.} =
   var request = "*" & $(2 + args.len()) & "\c\L"
   request.add("$" & $cmd.len() & "\c\L")
