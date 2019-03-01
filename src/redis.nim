@@ -149,7 +149,7 @@ proc managedRecv(
     if numReceived != size:
       raiseReplyError(r, "recv failed")
 
-proc managedRecvLine(r: Redis | AsyncRedis): Future[string] {.multisync.} =
+proc managedRecvLine*(r: Redis | AsyncRedis): Future[string] {.multisync.} =
   if r.pipeline.enabled:
     result = ""
   else:
