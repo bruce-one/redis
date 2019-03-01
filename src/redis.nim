@@ -185,7 +185,7 @@ proc parseStatus(r: Redis | AsyncRedis, line: string = ""): RedisStatus =
 
   result = line.substr(1) # Strip '+'
 
-proc readStatus(r: Redis | AsyncRedis): Future[RedisStatus] {.multisync.} =
+proc readStatus*(r: Redis | AsyncRedis): Future[RedisStatus] {.multisync.} =
   let line = await r.managedRecvLine()
 
   if line.len == 0:
@@ -213,7 +213,7 @@ proc parseInteger(r: Redis | AsyncRedis, line: string = ""): RedisInteger =
   if parseBiggestInt(line, result, 1) == 0:
     raiseReplyError(r, "Unable to parse integer.")
 
-proc readInteger(r: Redis | AsyncRedis): Future[RedisInteger] {.multisync.} =
+proc readInteger*(r: Redis | AsyncRedis): Future[RedisInteger] {.multisync.} =
   let line = await r.managedRecvLine()
   if line.len == 0:
     return -1
@@ -221,7 +221,7 @@ proc readInteger(r: Redis | AsyncRedis): Future[RedisInteger] {.multisync.} =
   result = r.parseInteger(line)
   finaliseCommand(r)
 
-proc readSingleString(
+proc readSingleString*(
   r: Redis | AsyncRedis, line: string, allowMBNil: bool
 ): Future[Option[RedisString]] {.multisync.} =
   if r.pipeline.enabled:
@@ -246,7 +246,7 @@ proc readSingleString(
   var s = await r.managedRecv(numBytes + 2)
   result = some(strip(s))
 
-proc readSingleString(r: Redis | AsyncRedis): Future[RedisString] {.multisync.} =
+proc readSingleString*(r: Redis | AsyncRedis): Future[RedisString] {.multisync.} =
   # TODO: Rename these style of procedures to `processSingleString`?
   let line = await r.managedRecvLine()
   if line.len == 0:
@@ -256,9 +256,9 @@ proc readSingleString(r: Redis | AsyncRedis): Future[RedisString] {.multisync.} 
   result = res.get(redisNil)
   finaliseCommand(r)
 
-proc readNext(r: Redis): RedisList
-proc readNext(r: AsyncRedis): Future[RedisList]
-proc readArrayLines(r: Redis | AsyncRedis, countLine: string): Future[RedisList] {.multisync.} =
+proc readNext*(r: Redis): RedisList
+proc readNext*(r: AsyncRedis): Future[RedisList]
+proc readArrayLines*(r: Redis | AsyncRedis, countLine: string): Future[RedisList] {.multisync.} =
   if countLine[0] != '*':
     raiseInvalidReply(r, '*', countLine[0])
 
@@ -278,14 +278,14 @@ proc readArrayLines(r: Redis | AsyncRedis, countLine: string): Future[RedisList]
       for item in parsed:
         result.add(item)
 
-proc readArrayLines(r: Redis | AsyncRedis): Future[RedisList] {.multisync.} =
+proc readArrayLines*(r: Redis | AsyncRedis): Future[RedisList] {.multisync.} =
   let line = await r.managedRecvLine()
   if line.len == 0:
     return @[]
 
   result = await r.readArrayLines(line)
 
-proc readBulkString(r: Redis | AsyncRedis, allowMBNil = false): Future[RedisString] {.multisync.} =
+proc readBulkString*(r: Redis | AsyncRedis, allowMBNil = false): Future[RedisString] {.multisync.} =
   let line = await r.managedRecvLine()
   if line.len == 0:
     return ""
@@ -294,7 +294,7 @@ proc readBulkString(r: Redis | AsyncRedis, allowMBNil = false): Future[RedisStri
   result = res.get(redisNil)
   finaliseCommand(r)
 
-proc readArray(r: Redis | AsyncRedis): Future[RedisList] {.multisync.} =
+proc readArray*(r: Redis | AsyncRedis): Future[RedisList] {.multisync.} =
   let line = await r.managedRecvLine()
   if line.len == 0:
     return @[]
@@ -302,7 +302,7 @@ proc readArray(r: Redis | AsyncRedis): Future[RedisList] {.multisync.} =
   result = await r.readArrayLines(line)
   finaliseCommand(r)
 
-proc readNext(r: Redis | AsyncRedis): Future[RedisList] {.multisync.} =
+proc readNext*(r: Redis | AsyncRedis): Future[RedisList] {.multisync.} =
   let line = await r.managedRecvLine()
 
   if line.len == 0:
