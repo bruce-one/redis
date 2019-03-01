@@ -171,7 +171,7 @@ proc raiseNoOK*(r: Redis | AsyncRedis, status: string) =
   elif not pipelined and status != "OK":
     raiseReplyError(r, "Expected \"OK\" got \"$1\"" % status)
 
-proc parseStatus(r: Redis | AsyncRedis, line: string = ""): RedisStatus =
+proc parseStatus*(r: Redis | AsyncRedis, line: string = ""): RedisStatus =
   if r.pipeline.enabled:
     return "PIPELINED"
 
@@ -194,7 +194,7 @@ proc readStatus*(r: Redis | AsyncRedis): Future[RedisStatus] {.multisync.} =
   result = r.parseStatus(line)
   finaliseCommand(r)
 
-proc parseInteger(r: Redis | AsyncRedis, line: string = ""): RedisInteger =
+proc parseInteger*(r: Redis | AsyncRedis, line: string = ""): RedisInteger =
   if r.pipeline.enabled:
     return -1
 
